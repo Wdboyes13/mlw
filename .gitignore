@@ -3,3 +3,4 @@ test/*.mlwlib
 test/*.mlwbc
 lib/
 *build*/
+src/antlr/.antlr
