@@ -1,0 +1,5 @@
+.clangd
+test/*.mlwlib
+test/*.mlwbc
+lib/
+*build*/

@@ -1,0 +1,13 @@
+!import printer
+!extern println(i32) -> void
+
+fn add(x: i32, y: i32) -> i32 {
+    var res: i32 = x + y;
+    return res;
+}
+
+fn main() -> i32 {
+    var res: i32 = add(10, 10);
+    println(res);
+    return 0;
+}
