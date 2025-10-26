@@ -5,3 +5,5 @@ lib/
 *build*/
 src/antlr/.antlr
 .idea
+.DS_Store
+src/.DS_Store
