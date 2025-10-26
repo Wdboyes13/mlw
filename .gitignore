@@ -4,3 +4,4 @@ test/*.mlwbc
 lib/
 *build*/
 src/antlr/.antlr
+.idea
