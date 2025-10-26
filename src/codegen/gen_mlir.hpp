@@ -13,10 +13,12 @@
 #include <llvm/IR/Attributes.h>
 #include <llvm/IR/BasicBlock.h>
 
+#include "gen_tree.hpp"
+
 
 class LLVMGen : public MLWBaseListener {
     public:
-        LLVMGen(llvm::LLVMContext* ctx);
+        LLVMGen(llvm::LLVMContext* ctx, ParseResources* _rsrsc, bool debug = false);
         auto getModule() { return std::move(_module); }
 
           // Override key listener methods
@@ -51,6 +53,9 @@ class LLVMGen : public MLWBaseListener {
         void enterExternStatement(MLWParser::ExternStatementContext *ctx) override;
 
         void exitExprStatement(MLWParser::ExprStatementContext *ctx) override;
+
+        void enterEveryRule(antlr4::ParserRuleContext *ctx) override;
+        void visitTerminal(antlr4::tree::TerminalNode *node) override;
     private:
         llvm::LLVMContext* ctx;
         llvm::IRBuilder<> builder;
@@ -71,4 +76,7 @@ class LLVMGen : public MLWBaseListener {
         std::stack<llvm::IRBuilderBase::InsertPoint> insertionStack;
         int implibs_idx = 0;
         int str_idx = 0;
+
+        bool debug = false;
+        ParseResources* debug_parse_rsrsc;
 };

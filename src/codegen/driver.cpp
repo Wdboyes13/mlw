@@ -23,6 +23,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    bool debug = false;
+
+    if (argc > 2) {
+        for (int i = 2; i < argc; i++) {
+            if (std::string(argv[i]) == "-d" || std::string(argv[i]) == "--debug") debug = true;
+        }
+    }
+
     auto resources = generate_tree(argv[1]);
     if (!resources || !resources->tree) {
         llvm::errs() << "Failed to generate parse tree\n";
@@ -31,13 +39,13 @@ int main(int argc, char* argv[]) {
 
     llvm::LLVMContext* ctx = new llvm::LLVMContext();
 
-    LLVMGen generator(ctx);
+    LLVMGen generator(ctx, resources.get(), debug);
     tree::ParseTreeWalker walker;
     walker.walk(&generator, resources->tree);
 
     auto module = generator.getModule();
     if (module) {
-        module->print(llvm::outs(), nullptr);
+        if (debug) module->print(llvm::outs(), nullptr);
         auto outputFilename = make_bc_name(argv[1]);
         std::string errorInfo;
 

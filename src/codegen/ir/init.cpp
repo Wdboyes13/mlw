@@ -10,8 +10,8 @@ using namespace antlr4;
 #define def_mlg_pctx(method_name) void LLVMGen::method_name(MLWParser::ProgramContext* ctx)
 #define def_mlg_fctx(method_name) void LLVMGen::method_name(MLWParser::FunctionDefinitionContext* ctx)
 
-LLVMGen::LLVMGen(llvm::LLVMContext* ctx)
-    : ctx(ctx), builder(*ctx) {}
+LLVMGen::LLVMGen(llvm::LLVMContext* ctx, ParseResources* rsrsc, bool _debug)
+    : ctx(ctx), builder(*ctx), debug_parse_rsrsc(rsrsc), debug(_debug) {}
 
 def_mlg_pctx(enterProgram) {
     _module = std::make_unique<llvm::Module>("program", *this->ctx);

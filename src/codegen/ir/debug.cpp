@@ -1,0 +1,11 @@
+#include "../gen_mlir.hpp"
+#include "ParserRuleContext.h"
+#include "tree/TerminalNode.h"
+
+void LLVMGen::enterEveryRule(antlr4::ParserRuleContext *ctx) {
+    if (debug) llvm::outs() << "ENTER RULE: " << debug_parse_rsrsc->parser->getRuleNames().at(ctx->getRuleIndex()) << "\n";
+}
+
+void LLVMGen::visitTerminal(antlr4::tree::TerminalNode* node) {
+    if (debug) llvm::outs() << "VISIT TERMINAL: " << node->getSymbol() << "\n";
+}
