@@ -7,8 +7,8 @@
 
 #include <llvm/Support/TargetSelect.h>
 
-MLWVM::MLWVM(std::unique_ptr<llvm::Module> mod, llvm::LLVMContext& ctx, int argc, char** argv, std::string script_pth)
-        : module(std::move(mod)), context(ctx), script_path(script_pth) {
+MLWVM::MLWVM(std::unique_ptr<llvm::Module> mod, llvm::LLVMContext& ctx, int argc, char** argv, std::string script_pth, bool debug)
+        : module(std::move(mod)), context(ctx), script_path(script_pth), log(debug) {
         // Initialize LLVM targets
     llvm::InitializeAllTargetInfos();
     llvm::InitializeAllTargets();

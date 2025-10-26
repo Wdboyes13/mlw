@@ -4,15 +4,15 @@
    Runtime (VM) Finalization (vm_finalize.cpp) */
 
 #include "vm_class.hpp"
-#include <filesystem>
+#include <llvm/Support/FileSystem.h>
 
 void MLWVM::finalize() {
     // Create LLJIT instance
     auto jitResult = llvm::orc::LLJITBuilder().create();
     if (!jitResult) {
-        llvm::errs() << "Failed to create LLJIT: "
+        log << "Failed to create LLJIT: "
                     << llvm::toString(jitResult.takeError()) << "\n";
-        std::abort();
+        log.abort();
     }
 
     jit = std::move(*jitResult);
@@ -22,21 +22,22 @@ void MLWVM::finalize() {
 
     // Load your import libraries
     for (const auto& libName : implibs) {
-        std::string fullLibName = std::filesystem::absolute(locate_lib(libName, script_path));
+        std::string fullLibName = locate_lib(libName);
 
-        llvm::errs() << "Loading library: " << fullLibName << "\n";
+        log << "Loading library: " << fullLibName << "\n";
 
         std::string errorMsg;
         if (!llvm::sys::DynamicLibrary::LoadLibraryPermanently(fullLibName.c_str(), &errorMsg)) {
-            llvm::errs() << "Successfully loaded: " << fullLibName << "\n";
+            log << "Successfully loaded: " << fullLibName << "\n";
         } else {
-            llvm::errs() << "Warning: Failed to load " << fullLibName << ": " << errorMsg << "\n";
+            log << "Warning: Failed to load " << fullLibName << ": " << errorMsg << "\n";
 
             // Try without prefix/suffix
             if (!llvm::sys::DynamicLibrary::LoadLibraryPermanently(libName.c_str(), &errorMsg)) {
-                llvm::errs() << "Successfully loaded: " << libName << " (raw name)\n";
+                log << "Successfully loaded: " << libName << " (raw name)\n";
             } else {
-                llvm::errs() << "Error: Could not load library in any form: " << libName << "\n";
+                log << "Error: Could not load library in any form: " << libName << "\n";
+                log.abort();
             }
         }
     }
@@ -44,9 +45,9 @@ void MLWVM::finalize() {
     // Add the module to JIT
     llvm::orc::ThreadSafeModule tsm(std::move(module), std::make_unique<llvm::LLVMContext>());
     if (auto err = jit->addIRModule(std::move(tsm))) {
-        llvm::errs() << "Failed to add IR module: " << llvm::toString(std::move(err)) << "\n";
-        std::abort();
+        log << "Failed to add IR module: " << llvm::toString(std::move(err)) << "\n";
+        log.abort();
     }
 
-    llvm::errs() << "JIT engine finalized successfully with " << implibs.size() << " libraries loaded\n";
+    log << "JIT engine finalized successfully with " << implibs.size() << " libraries loaded\n";
 }
