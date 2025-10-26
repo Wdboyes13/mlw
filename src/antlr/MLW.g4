@@ -1,5 +1,10 @@
 grammar MLW;
 
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   MLW Grammar Definition (MLW.g4) */
+
 program: linkerstatement* functionDefinition+ EOF;
 
 linkerstatement:

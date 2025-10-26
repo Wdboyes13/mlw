@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Runtime (VM) Function Executor (vm_run.cpp) */
+
 #include "vm_class.hpp"
 
 llvm::GenericValue MLWVM::runFunction(const std::string& functionName,

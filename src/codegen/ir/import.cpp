@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Import and extern support (import.cpp) */
+
 #include "../gen_llvm.hpp"
 
 void LLVMGen::enterImportStatement(MLWParser::ImportStatementContext *ctx) {

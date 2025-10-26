@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Runtime (VM) Finalization (vm_finalize.cpp) */
+
 #include "vm_class.hpp"
 #include <filesystem>
 

@@ -1,3 +1,10 @@
+#pragma once
+
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   IR Generator Class Definition (gen_llvm.cpp) */
+
 #include <string>
 
 #include <stack>

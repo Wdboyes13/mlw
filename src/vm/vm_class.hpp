@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Runtime (VM) Class Definition (vm_class.hpp) */
+
 #pragma once
 
 #include <memory>

@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Runtime (VM) Import Library Resolution (vm_link.cpp) */
+
 #include "vm_class.hpp"
 
 std::string MLWVM::locate_lib(const std::string &basename, std::string script_basename) {

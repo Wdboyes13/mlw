@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Arithmetic Generation (arithmetic.cpp) */
+
 #include "../gen_llvm.hpp"
 
 void LLVMGen::enterAdditiveExpr(MLWParser::AdditiveExprContext *ctx) {

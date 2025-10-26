@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Compiler Driver (driver.cpp) */
+
 #include "gen_llvm.hpp"
 #include "gen_tree.hpp"
 

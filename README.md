@@ -4,7 +4,7 @@ Its syntax is based on Rust, and it's built on ANTLR4 and LLVM.
 
 ## Features  
 C Imports - Needed because we have litterally no standard library *yet* so just import everything from C   
-> (They can't have file extensions though cause C++ hates me)  
+> (They can't have file extensions though cause C++ hates me)   
 
 Functions - Also needed, since without it the VM has litterally nothing to call  
 Arithmetic - Because its a *real* programming lamguage (kinda)  
@@ -33,4 +33,10 @@ fn main() -> i32 {
     println(res);
     return 0;
 }  
-```
+```  
+
+
+## License  
+> Copyright (c) 2025 Wdboyes13  
+> Licensed under the __MIT License__  
+> SPDX-License-Identifier:MIT  

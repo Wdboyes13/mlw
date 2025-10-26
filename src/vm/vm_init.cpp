@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Runtime (VM) Initialization (vm_init.cpp) */
+
 #include "vm_class.hpp"
 
 #include <llvm/Support/TargetSelect.h>

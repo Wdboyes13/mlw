@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Parse tree generator header (gen_tree.hpp) */
+
 #pragma once
 
 #include <string>

@@ -1,3 +1,8 @@
+/* Copyright (c) 2025 Wdboyes13
+   SPDX-License-Identifier: Wdboyes13 
+   This code is part of the MLW Project 
+   Debug printer (debug.cpp) */
+
 #include "../gen_llvm.hpp"
 #include "ParserRuleContext.h"
 #include "tree/TerminalNode.h"
