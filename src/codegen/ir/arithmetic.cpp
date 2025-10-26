@@ -1,4 +1,4 @@
-#include "../gen_mlir.hpp"
+#include "../gen_llvm.hpp"
 
 void LLVMGen::enterAdditiveExpr(MLWParser::AdditiveExprContext *ctx) {
     operatorStack.push(ctx->op->getText());

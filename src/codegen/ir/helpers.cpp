@@ -1,4 +1,4 @@
-#include "../gen_mlir.hpp"
+#include "../gen_llvm.hpp"
 
 // Helper methods
 llvm::Type* LLVMGen::getType(const std::string& typeName) {

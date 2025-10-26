@@ -1,4 +1,4 @@
-#include "../gen_mlir.hpp"
+#include "../gen_llvm.hpp"
 
 #include <MLWLexer.h>
 #include <MLWParser.h>
