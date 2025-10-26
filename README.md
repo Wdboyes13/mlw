@@ -37,6 +37,6 @@ fn main() -> i32 {
 
 
 ## License  
-> Copyright (c) 2025 Wdboyes13  
-> Licensed under the __MIT License__  
+> Copyright (c) __2025 Wdboyes13__   
+> Licensed under the [MIT License](/LICENSE)  
 > SPDX-License-Identifier:MIT  
