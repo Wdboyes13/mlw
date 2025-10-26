@@ -1,17 +1,14 @@
 #include "gen_mlir.hpp"
 #include "gen_tree.hpp"
 
-#include <mlir/IR/MLIRContext.h>
-#include <mlir/Bytecode/BytecodeWriter.h>
-#include <mlir/Support/FileUtilities.h>
-#include <llvm/Support/ToolOutputFile.h>
 
-#include <MLWDialect.h>
+#include <llvm/Support/ToolOutputFile.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
 
 #include <filesystem>
 
 using namespace antlr4;
-using namespace mlir;
 
 std::string make_bc_name(std::string srcname) {
     std::filesystem::path p(srcname);
@@ -32,28 +29,26 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    MLIRContext ctx;
-    llvm::outs() << "Registering func dialect\n";
-    ctx.loadDialect<func::FuncDialect>();
-    llvm::outs() << "Registering arith dialect\n";
-    ctx.loadDialect<arith::ArithDialect>();
-    llvm::outs() << "Registering MLW dialect\n";
-    ctx.loadDialect<mlw::MLWDialect>();
-    ctx.allowUnregisteredDialects();
+    llvm::LLVMContext* ctx = new llvm::LLVMContext();
 
-    MLIRGen generator(&ctx);
+    LLVMGen generator(ctx);
     tree::ParseTreeWalker walker;
     walker.walk(&generator, resources->tree);
 
     auto module = generator.getModule();
     if (module) {
-        module->print(llvm::outs());
+        module->print(llvm::outs(), nullptr);
         auto outputFilename = make_bc_name(argv[1]);
-        auto out = openOutputFile(outputFilename);
-        if (failed(writeBytecodeToFile(module, out->os()))) {
+        std::string errorInfo;
+
+        std::error_code errorCode;
+        auto out = std::make_unique<llvm::ToolOutputFile>(outputFilename, errorCode, llvm::sys::fs::OF_None);
+        if (errorCode) {
             llvm::errs() << "Failed to write output file\n";
             return 1;
         }
+
+        llvm::WriteBitcodeToFile(*module, out->os());
         out->keep();
     } else {
         llvm::errs() << "Failed to generate MLIR\n";

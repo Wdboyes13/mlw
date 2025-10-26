@@ -3,27 +3,8 @@ project(mlw)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(mlir REQUIRED CONFIG)
-
-list(APPEND CMAKE_MODULE_PATH "${MLIR_CMAKE_DIR}")
-include(AddMLIR)
-
-add_library(
-        MLWDialect STATIC
-        src/vm/dialect/MLWDialect.h
-        src/vm/dialect/MLWDialect.cpp
-)
-
-target_include_directories(MLWDialect PRIVATE
-        ${MLIR_INCLUDE_DIRS}
-        ${LLVM_INCLUDE_DIRS}
-)
-
-target_link_libraries(MLWDialect PRIVATE
-        MLIR
-        LLVMSupport
-        LLVMDemangle
-)
+find_package(llvm REQUIRED CONFIG)
+include(AddLLVM)
 
 add_executable(${CMAKE_PROJECT_NAME}c
         src/antlr/gen/MLWBaseListener.cpp
@@ -34,20 +15,18 @@ add_executable(${CMAKE_PROJECT_NAME}c
         src/codegen/driver.cpp
         src/codegen/gen_tree.cpp
 
-        src/codegen/mlir/arithmetic.cpp
-        src/codegen/mlir/vardef.cpp
-        src/codegen/mlir/function.cpp
-        src/codegen/mlir/init.cpp
-        src/codegen/mlir/helpers.cpp
-        src/codegen/mlir/import.cpp
+        src/codegen/ir/arithmetic.cpp
+        src/codegen/ir/vardef.cpp
+        src/codegen/ir/function.cpp
+        src/codegen/ir/init.cpp
+        src/codegen/ir/helpers.cpp
+        src/codegen/ir/import.cpp
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME}c PRIVATE
         src/antlr/gen
-        ${MLIR_INCLUDE_DIRS}
         ${LLVM_INCLUDE_DIRS}
         lib/antlr4/antlr4-runtime
-        src/vm/dialect
 )
 
 target_link_directories(${CMAKE_PROJECT_NAME}c PRIVATE
@@ -55,14 +34,12 @@ target_link_directories(${CMAKE_PROJECT_NAME}c PRIVATE
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}c PRIVATE
-        MLIR
-        MLIRBytecodeWriter
+        LLVMCore
+        LLVMBinaryFormat
+        LLVMBitWriter
         LLVMDemangle
         LLVMSupport
         antlr4-runtime
-        MLWDialect
-        MLIRFuncDialect
-        MLIRArithDialect
 )
 
 add_executable(${CMAKE_PROJECT_NAME}
@@ -70,21 +47,20 @@ add_executable(${CMAKE_PROJECT_NAME}
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-        ${MLIR_INCLUDE_DIRS}
         ${LLVM_INCLUDE_DIRS}
-        src/vm/dialect
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-        MLIR
-        MLIRBytecodeReader
-        MLIRParser
+        LLVMTarget
+        LLVMCodegen
+        LLVMCore
         LLVMSupport
         LLVMDemangle
-        MLIRExecutionEngine
-        MLIRFuncDialect
-        MLIRArithDialect
-        MLIRLLVMDialect
-        MLIRExecutionEngineUtils
-        MLWDialect
+        LLVMLinker
+        LLVMExecutionEngine
+        LLVMRuntimeDyld
+        LLVMOrcJIT
+        LLVMAArch64AsmParser
+        LLVMAArch64CodeGen
+        LLVMAArch64Info
 )
