@@ -1,0 +1,10 @@
+#pragma once
+
+#cmakedefine MLW_TARGET_X86
+#cmakedefine MLW_TARGET_AArch64
+#cmakedefine MLW_TARGET_ARM
+#cmakedefine MLW_TARGET_PowerPC
+#cmakedefine MLW_TARGET_RISCV
+#cmakedefine MLW_TARET_Mips
+#cmakedefine MLW_TARGET_Sparc
+#cmakedefine MLW_TARGET_SystemZ

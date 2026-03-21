@@ -1,15 +1,15 @@
 /* Copyright (c) 2025 Wdboyes13
-   SPDX-License-Identifier: Wdboyes13 
-   This code is part of the MLW Project 
+   SPDX-License-Identifier: Wdboyes13
+   This code is part of the MLW Project
    Arithmetic Generation (arithmetic.cpp) */
 
 #include "../gen_llvm.hpp"
 
-void LLVMGen::enterAdditiveExpr(MLWParser::AdditiveExprContext *ctx) {
+void LLVMGen::enterAdditiveExpr(MLWParser::AdditiveExprContext* ctx) {
     operatorStack.push(ctx->op->getText());
 }
 
-void LLVMGen::exitAdditiveExpr(MLWParser::AdditiveExprContext *ctx) {
+void LLVMGen::exitAdditiveExpr(MLWParser::AdditiveExprContext* ctx) {
     if (valueStacks.top().size() < 2) {
         llvm::errs() << "Not enough values for additive expression\n";
         return;
@@ -31,7 +31,8 @@ void LLVMGen::exitAdditiveExpr(MLWParser::AdditiveExprContext *ctx) {
     if (op == "+") {
         result = builder.CreateAdd(lhs, rhs);
     } else if (op == "-") {
-        result = builder.CreateSub(lhs, rhs);  // Fixed: CreateSub instead of CreateAdd
+        result = builder.CreateSub(
+            lhs, rhs); // Fixed: CreateSub instead of CreateAdd
     } else {
         llvm::errs() << "Unknown additive operator: " << op << "\n";
         return;
@@ -42,11 +43,13 @@ void LLVMGen::exitAdditiveExpr(MLWParser::AdditiveExprContext *ctx) {
     }
 }
 
-void LLVMGen::enterMultiplicativeExpr(MLWParser::MultiplicativeExprContext *ctx) {
+void LLVMGen::enterMultiplicativeExpr(
+    MLWParser::MultiplicativeExprContext* ctx) {
     operatorStack.push(ctx->op->getText());
 }
 
-void LLVMGen::exitMultiplicativeExpr(MLWParser::MultiplicativeExprContext *ctx) {
+void LLVMGen::exitMultiplicativeExpr(
+    MLWParser::MultiplicativeExprContext* ctx) {
     if (valueStacks.top().size() < 2) {
         llvm::errs() << "Not enough values for multiplicative expression\n";
         return;
@@ -72,14 +75,15 @@ void LLVMGen::exitMultiplicativeExpr(MLWParser::MultiplicativeExprContext *ctx) 
         if (lhs->getType()->isIntegerTy()) {
             result = builder.CreateSDiv(lhs, rhs);
         } else {
-            result = builder.CreateFDiv(lhs, rhs);  // For floating point
+            result = builder.CreateFDiv(lhs, rhs); // For floating point
         }
     } else if (op == "%") {
         // Handle modulo operation
         if (lhs->getType()->isIntegerTy()) {
             result = builder.CreateSRem(lhs, rhs);
         } else {
-            llvm::errs() << "Modulo operator only supported for integer types\n";
+            llvm::errs()
+                << "Modulo operator only supported for integer types\n";
             return;
         }
     } else {

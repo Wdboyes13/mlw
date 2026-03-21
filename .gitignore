@@ -1,7 +1,7 @@
 .clangd
 test/*.mlwlib
 test/*.mlwbc
-lib/
+lib/antlr4
 *build*/
 src/antlr/.antlr
 .idea

@@ -12,6 +12,7 @@ add_executable(${CMAKE_PROJECT_NAME}
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        ${CMAKE_BINARY_DIR}
         ${LLVM_INCLUDE_DIRS}
 )
 
@@ -20,7 +21,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64|i[3456]86")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
     set(LLVM_TARGET "AArch64")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm|armv7")
-    set(LLVM_TARGET "ARM") 
+    set(LLVM_TARGET "ARM")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc|powerpc")
     set(LLVM_TARGET "PowerPC")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "riscv")
@@ -35,9 +36,16 @@ else()
     message(FATAL_ERROR "Unable to identify your CPU Architecture")
 endif()
 
+set(MLW_TARGET_${LLVM_TARGET} 1)
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/src/vm/config.h.in
+    ${CMAKE_BINARY_DIR}/config.h
+)
+
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         LLVMTarget
-        LLVMCodegen
+        LLVMCodeGen
         LLVMCore
         LLVMSupport
         LLVMDemangle

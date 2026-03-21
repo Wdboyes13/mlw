@@ -1,13 +1,13 @@
 /* Copyright (c) 2025 Wdboyes13
-   SPDX-License-Identifier: Wdboyes13 
-   This code is part of the MLW Project 
+   SPDX-License-Identifier: Wdboyes13
+   This code is part of the MLW Project
    Runtime (VM) Import Library Resolution (vm_link.cpp) */
 
-#include "vm_class.hpp"
-#include <llvm/Support/Path.h>
 #include <llvm/Support/FileSystem.h>
+#include <llvm/Support/Path.h>
+#include "vm_class.hpp"
 
-std::string MLWVM::locate_lib(const std::string &basename) {
+std::string MLWVM::locate_lib(const std::string& basename) {
     llvm::SmallString<128> cwd;
     if (auto ec = llvm::sys::fs::current_path(cwd)) {
         log << "Error getting current path: " << ec.message() << "\n";
@@ -16,22 +16,20 @@ std::string MLWVM::locate_lib(const std::string &basename) {
 
     llvm::SmallString<128> temp_path = cwd;
     llvm::sys::path::append(temp_path, basename);
-    llvm::sys::fs::make_absolute(temp_path, temp_path);
-    llvm::SmallString<128> parent_path = llvm::sys::path::parent_path(temp_path);
+    llvm::sys::path::make_absolute(temp_path, temp_path);
+    llvm::SmallString<128> parent_path =
+        llvm::sys::path::parent_path(temp_path);
 
-    if (!parent_path.empty() && !llvm::sys::path::is_separator(parent_path.back())) {
+    if (!parent_path.empty() &&
+        !llvm::sys::path::is_separator(parent_path.back())) {
         parent_path += llvm::sys::path::get_separator();
     }
 
     auto script_basename = parent_path.str().str();
-    
-    std::vector<std::string> search_paths = {
-        script_basename, 
-        "/usr/local/lib/mlw/",
-        "./lib/mlw/", 
-        "../lib/mlw/",
-        "./"
-    };
+
+    std::vector<std::string> search_paths = {script_basename,
+                                             "/usr/local/lib/mlw/",
+                                             "./lib/mlw/", "../lib/mlw/", "./"};
 
     for (const auto& search_path : search_paths) {
         llvm::SmallString<256> full_path;
@@ -39,7 +37,8 @@ std::string MLWVM::locate_lib(const std::string &basename) {
         llvm::sys::path::append(full_path, basename);
         llvm::SmallString<256> abs_path;
         if (auto ec = llvm::sys::fs::make_absolute(full_path)) {
-            log << "Path error: " << ec.message() << " for " << full_path.c_str() << "\n";
+            log << "Path error: " << ec.message() << " for "
+                << full_path.c_str() << "\n";
             continue;
         }
         llvm::sys::path::remove_dots(full_path, true);
@@ -51,7 +50,7 @@ std::string MLWVM::locate_lib(const std::string &basename) {
             log << "Not found at: " << full_path.c_str() << "\n";
         }
     }
-    
+
     log << "No match found for library\n";
     log.abort();
 }
@@ -68,14 +67,17 @@ void MLWVM::findImplibs() {
     }
 
     for (int i = 0; i < num_implibs; i++) {
-        auto implib_var = module->getNamedGlobal("__vm_implibs." + std::to_string(i));
+        auto implib_var =
+            module->getNamedGlobal("__vm_implibs." + std::to_string(i));
         if (!implib_var) {
-            log << "Import Library Count Variable (__vm_implibs_count) contains incorrect value\n";
+            log << "Import Library Count Variable (__vm_implibs_count) "
+                   "contains incorrect value\n";
             log.abort();
         }
 
         auto implib_initializer = implib_var->getInitializer();
-        if (auto* constint = llvm::dyn_cast<llvm::ConstantDataArray>(implib_initializer)) {
+        if (auto* constint =
+                llvm::dyn_cast<llvm::ConstantDataArray>(implib_initializer)) {
             implibs.push_back(constint->getAsString().str());
         }
     }

@@ -18,12 +18,8 @@ add_executable(${CMAKE_PROJECT_NAME}c
 
 target_include_directories(${CMAKE_PROJECT_NAME}c PRIVATE
         ${CMAKE_SOURCE_DIR}/src/antlr/gen
+        ${antlr4-runtime_SOURCE_DIR}/runtime/src
         ${LLVM_INCLUDE_DIRS}
-        ${CMAKE_SOURCE_DIR}/lib/antlr4/antlr4-runtime
-)
-
-target_link_directories(${CMAKE_PROJECT_NAME}c PRIVATE
-        ${CMAKE_SOURCE_DIR}/lib/antlr4/lib
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}c PRIVATE
@@ -32,6 +28,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}c PRIVATE
         LLVMBitWriter
         LLVMDemangle
         LLVMSupport
-        antlr4-runtime
+        antlr4_static
         mlwc_parser
 )

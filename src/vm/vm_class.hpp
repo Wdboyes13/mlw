@@ -1,16 +1,16 @@
 /* Copyright (c) 2025 Wdboyes13
-   SPDX-License-Identifier: Wdboyes13 
-   This code is part of the MLW Project 
+   SPDX-License-Identifier: Wdboyes13
+   This code is part of the MLW Project
    Runtime (VM) Class Definition (vm_class.hpp) */
 
 #pragma once
 
-#include <memory>
-#include <llvm/IR/Module.h>
-#include <llvm/ExecutionEngine/Orc/LLJIT.h>
-#include <llvm/Support/InitLLVM.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
+#include <llvm/ExecutionEngine/Orc/LLJIT.h>
+#include <llvm/IR/Module.h>
+#include <llvm/Support/InitLLVM.h>
 #include <csignal>
+#include <memory>
 #include <system_error>
 #include "llvm/Support/Signals.h"
 
@@ -23,7 +23,8 @@ class Logger {
 
     void handle_crash(int code) {
         llvm::errs() << "ERROR OCCURRED - FULL LOG @ __mlw_vm.log\n";
-        llvm::errs() << "If this is a bug, report it @ willdev2025@outlook.com along with the log contents\n";
+        llvm::errs() << "If this is a bug, report it @ willdev2025@outlook.com "
+                        "along with the log contents\n";
         llvm::errs() << "VM ABORTING\n";
 
         file << "\n=== CRASH SIGNAL " << strsignal(code) << " ===\n";
@@ -43,8 +44,9 @@ class Logger {
         std::_Exit(1);
     }
 
-public:
-    Logger(bool debug) : debug(debug), file("__mlw_vm.log", ec, llvm::sys::fs::OF_Text) {
+  public:
+    Logger(bool debug)
+        : debug(debug), file("__mlw_vm.log", ec, llvm::sys::fs::OF_Text) {
         llvm::sys::DisableSystemDialogsOnCrash();
         current_logger = this;
         std::signal(SIGABRT, signal_handler);
@@ -55,29 +57,29 @@ public:
 
     void log(std::string message) {
         full_log.append(message);
-        if (debug) llvm::errs() << message;
+        if (debug)
+            llvm::errs() << message;
     }
 
     void log(int message) {
         full_log.append(std::to_string(message));
-        if (debug) llvm::errs() << message;
-    } 
+        if (debug)
+            llvm::errs() << message;
+    }
 
-    template <typename... T>
+    template<typename... T>
     Logger& operator<<(T... str) {
         log(str...);
         return *this;
     }
 
-    void abort() {
-        handle_crash(SIGABRT);
-    }
+    void abort() { handle_crash(SIGABRT); }
 };
 
 inline Logger* Logger::current_logger = nullptr;
 
 class MLWVM {
-private:
+  private:
     std::unique_ptr<llvm::Module> module;
     std::unique_ptr<llvm::orc::LLJIT> jit;
     llvm::LLVMContext& context;
@@ -87,12 +89,14 @@ private:
     std::vector<std::string> implibs;
     std::string script_path;
 
-public:
+  public:
     Logger log;
-    std::string locate_lib(const std::string &basename);
-    MLWVM(std::unique_ptr<llvm::Module> mod, llvm::LLVMContext& ctx, int argc, char** argv, std::string script_pth, bool debug);
+    std::string locate_lib(const std::string& basename);
+    MLWVM(std::unique_ptr<llvm::Module> mod, llvm::LLVMContext& ctx, int argc,
+          char** argv, std::string script_pth, bool debug);
     void findImplibs();
     void finalize();
-    llvm::GenericValue runFunction(const std::string& functionName,
-                                  const std::vector<llvm::GenericValue>& args = {});
+    llvm::GenericValue
+    runFunction(const std::string& functionName,
+                const std::vector<llvm::GenericValue>& args = {});
 };

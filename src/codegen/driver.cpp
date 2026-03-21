@@ -1,15 +1,14 @@
 /* Copyright (c) 2025 Wdboyes13
-   SPDX-License-Identifier: Wdboyes13 
-   This code is part of the MLW Project 
+   SPDX-License-Identifier: Wdboyes13
+   This code is part of the MLW Project
    Compiler Driver (driver.cpp) */
 
 #include "gen_llvm.hpp"
 #include "gen_tree.hpp"
 
-
-#include <llvm/Support/ToolOutputFile.h>
-#include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Support/ToolOutputFile.h>
 
 #include <filesystem>
 
@@ -21,7 +20,6 @@ std::string make_bc_name(std::string srcname) {
     return p;
 }
 
-
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         llvm::errs() << "Usage: " << argv[0] << " <source file>\n";
@@ -32,7 +30,9 @@ int main(int argc, char* argv[]) {
 
     if (argc > 2) {
         for (int i = 2; i < argc; i++) {
-            if (std::string(argv[i]) == "-d" || std::string(argv[i]) == "--debug") debug = true;
+            if (std::string(argv[i]) == "-d" ||
+                std::string(argv[i]) == "--debug")
+                debug = true;
         }
     }
 
@@ -50,12 +50,14 @@ int main(int argc, char* argv[]) {
 
     auto module = generator.getModule();
     if (module) {
-        if (debug) module->print(llvm::outs(), nullptr);
+        if (debug)
+            module->print(llvm::outs(), nullptr);
         auto outputFilename = make_bc_name(argv[1]);
         std::string errorInfo;
 
         std::error_code errorCode;
-        auto out = std::make_unique<llvm::ToolOutputFile>(outputFilename, errorCode, llvm::sys::fs::OF_None);
+        auto out = std::make_unique<llvm::ToolOutputFile>(
+            outputFilename, errorCode, llvm::sys::fs::OF_None);
         if (errorCode) {
             llvm::errs() << "Failed to write output file\n";
             return 1;

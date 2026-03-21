@@ -4,5 +4,5 @@ add_library(mlwc_parser STATIC gen/MLWBaseListener.cpp gen/MLWLexer.cpp gen/MLWL
 
 target_include_directories(mlwc_parser PRIVATE
         ${CMAKE_SOURCE_DIR}/src/antlr/gen
-        ${CMAKE_SOURCE_DIR}/lib/antlr4/antlr4-runtime
+        ${antlr4-runtime_SOURCE_DIR}/runtime/src
 )
