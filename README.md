@@ -1,6 +1,6 @@
-# MLW (Mini-Language by Wdboyes13)
-This is a small WIP programming language.  
+This is a small programming language.  
 Its syntax is based on Rust, and it's built on ANTLR4 and LLVM.  
+idfk what i was thinking with the name.
 
 ## Features  
 C Imports - Needed because we have litterally no standard library *yet* so just import everything from C   
@@ -34,7 +34,21 @@ fn main() -> i32 {
     return 0;
 }  
 ```  
+orrr with includes...  
+```
+@include "printer.mlwi"
 
+fn add(x: i32, y: i32) -> i32 {
+    var res: i32 = x + y;
+    return res;
+}
+
+fn main() -> i32 {
+    var res: i32 = add(10, 10);
+    println(res);
+    return 0;
+}
+```  
 
 ## License  
 > Copyright (c) __2025 Wdboyes13__   
