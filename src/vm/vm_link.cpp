@@ -29,7 +29,9 @@ std::string MLWVM::locate_lib(const std::string& basename) {
 
     std::vector<std::string> search_paths = {script_basename,
                                              "/usr/local/lib/mlw/",
-                                             "./lib/mlw/", "../lib/mlw/", "./"};
+                                             "./lib/mlw/",
+                                             "../lib/mlw/",
+                                             "./"};
 
     for (const auto& search_path : search_paths) {
         llvm::SmallString<256> full_path;
@@ -53,9 +55,10 @@ std::string MLWVM::locate_lib(const std::string& basename) {
 
     log << "No match found for library\n";
     log.abort();
+    return nullptr; // we shouldnt reach this, but add it just to satisfy clang
 }
 
-void MLWVM::findImplibs() {
+void MLWVM::find_implibs() {
     auto globcount = module->getNamedGlobal("__vm_implibs_count");
     if (!globcount) {
         log << "Couldn't find import library count\n";

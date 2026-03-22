@@ -3,17 +3,21 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(llvm REQUIRED CONFIG)
 include(AddLLVM)
 
+add_library(${CMAKE_PROJECT_NAME}-main STATIC vm_main.cpp)
+target_compile_options(${CMAKE_PROJECT_NAME}-main PRIVATE -fno-rtti)
+target_link_libraries(${CMAKE_PROJECT_NAME}-main PRIVATE LLVMCore LLVMSupport LLVMCodeGen)
+target_include_directories(${CMAKE_PROJECT_NAME}-main PRIVATE ${LLVM_INCLUDE_DIRS})
+
 add_executable(${CMAKE_PROJECT_NAME}
-        vm_main.cpp
-        vm_run.cpp
-        vm_link.cpp
-        vm_init.cpp
-        vm_finalize.cpp
+    vm_run.cpp
+    vm_link.cpp
+    vm_init.cpp
+    vm_finalize.cpp
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-        ${CMAKE_BINARY_DIR}
-        ${LLVM_INCLUDE_DIRS}
+    ${CMAKE_BINARY_DIR}
+    ${LLVM_INCLUDE_DIRS}
 )
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64|i[3456]86")
@@ -44,16 +48,17 @@ configure_file(
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-        LLVMTarget
-        LLVMCodeGen
-        LLVMCore
-        LLVMSupport
-        LLVMDemangle
-        LLVMLinker
-        LLVMExecutionEngine
-        LLVMRuntimeDyld
-        LLVMOrcJIT
-        LLVM${LLVM_TARGET}AsmParser
-        LLVM${LLVM_TARGET}CodeGen
-        LLVM${LLVM_TARGET}Info
+    LLVMTarget
+    LLVMCodeGen
+    LLVMCore
+    LLVMSupport
+    LLVMDemangle
+    LLVMLinker
+    LLVMExecutionEngine
+    LLVMRuntimeDyld
+    LLVMOrcJIT
+    LLVM${LLVM_TARGET}AsmParser
+    LLVM${LLVM_TARGET}CodeGen
+    LLVM${LLVM_TARGET}Info
+    ${CMAKE_PROJECT_NAME}-main
 )

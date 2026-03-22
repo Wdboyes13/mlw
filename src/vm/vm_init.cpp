@@ -66,8 +66,12 @@
         LLVMInitializeSystemZAsmParser()
 #endif
 
-MLWVM::MLWVM(std::unique_ptr<llvm::Module> mod, llvm::LLVMContext& ctx,
-             int argc, char** argv, std::string script_pth, bool debug)
+MLWVM::MLWVM(std::unique_ptr<llvm::Module> mod,
+             llvm::LLVMContext& ctx,
+             int argc,
+             char** argv,
+             std::string script_pth,
+             bool debug)
     : module(std::move(mod)), context(ctx), script_path(script_pth),
       log(debug) {
     // Initialize LLVM targets
@@ -78,6 +82,6 @@ MLWVM::MLWVM(std::unique_ptr<llvm::Module> mod, llvm::LLVMContext& ctx,
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetAsmParser();
 
-    initLLVM = std::make_unique<llvm::InitLLVM>(argc, argv);
-    findImplibs();
+    init_llvm = std::make_unique<llvm::InitLLVM>(argc, argv);
+    find_implibs();
 }

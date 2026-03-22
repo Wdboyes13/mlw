@@ -57,14 +57,16 @@ class Logger {
 
     void log(std::string message) {
         full_log.append(message);
-        if (debug)
+        if (debug) {
             llvm::errs() << message;
+        }
     }
 
     void log(int message) {
         full_log.append(std::to_string(message));
-        if (debug)
+        if (debug) {
             llvm::errs() << message;
+        }
     }
 
     template<typename... T>
@@ -83,7 +85,7 @@ class MLWVM {
     std::unique_ptr<llvm::Module> module;
     std::unique_ptr<llvm::orc::LLJIT> jit;
     llvm::LLVMContext& context;
-    std::unique_ptr<llvm::InitLLVM> initLLVM;
+    std::unique_ptr<llvm::InitLLVM> init_llvm;
 
     int num_implibs;
     std::vector<std::string> implibs;
@@ -92,11 +94,15 @@ class MLWVM {
   public:
     Logger log;
     std::string locate_lib(const std::string& basename);
-    MLWVM(std::unique_ptr<llvm::Module> mod, llvm::LLVMContext& ctx, int argc,
-          char** argv, std::string script_pth, bool debug);
-    void findImplibs();
+    MLWVM(std::unique_ptr<llvm::Module> mod,
+          llvm::LLVMContext& ctx,
+          int argc,
+          char** argv,
+          std::string script_pth,
+          bool debug);
+    void find_implibs();
     void finalize();
     llvm::GenericValue
-    runFunction(const std::string& functionName,
-                const std::vector<llvm::GenericValue>& args = {});
+    run_function(const std::string& functionName,
+                 const std::vector<llvm::GenericValue>& args = {});
 };

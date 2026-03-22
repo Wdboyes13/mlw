@@ -12,91 +12,90 @@ using namespace antlr4;
 
 void LLVMGen::exitExprStatement(MLWParser::ExprStatementContext* ctx) {
     // Expression statements should consume their result
-    if (!valueStacks.top().empty()) {
-        popValue(); // Discard the expression result
+    if (!value_stacks.top().empty()) {
+        pop_value(); // Discard the expression result
     }
 }
 
 void LLVMGen::exitIntLiteral(MLWParser::IntLiteralContext* ctx) {
-    auto contop =
-        llvm::ConstantInt::get(llvm::Type::getInt32Ty(*this->ctx),
-                               std::stoi(ctx->IntegerLiteral()->getText()));
-    pushValue(contop);
+    auto contop = llvm::ConstantInt::get(
+        llvm::Type::getInt32Ty(*this->ctx),
+        std::stoi(ctx->IntegerLiteral()->getText()));
+    push_value(contop);
 }
 
-llvm::StringRef getFncName(llvm::IRBuilder<>& builder) {
-    llvm::BasicBlock* currentBlock = builder.GetInsertBlock();
-    if (!currentBlock) {
+llvm::StringRef get_fnc_name(llvm::IRBuilder<>& builder) {
+    llvm::BasicBlock* current_block = builder.GetInsertBlock();
+    if (!current_block) {
         return "";
     }
 
-    llvm::Function* currentFunction = currentBlock->getParent();
-    if (!currentFunction) {
+    llvm::Function* current_function = current_block->getParent();
+    if (!current_function) {
         return "";
     }
 
-    return currentFunction->getName();
+    return current_function->getName();
 }
 
-std::string constructStrName(llvm::IRBuilder<>& builder, std::string dn) {
+std::string construct_str_name(llvm::IRBuilder<>& builder, std::string dn) {
     std::stringstream ss;
-    auto fnc = getFncName(builder);
+    auto fnc = get_fnc_name(builder);
     ss << "__strval_" << fnc.str() << "." << dn;
     return ss.str();
 }
 
 void LLVMGen::exitStringLiteral(MLWParser::StringLiteralContext* ctx) {
-    // For now, use integer placeholder for strings
     auto contop = builder.CreateGlobalString(
         ctx->StringLiteral()->getText(),
-        constructStrName(builder, std::to_string(str_idx)));
+        construct_str_name(builder, std::to_string(str_idx)));
     str_idx++;
 
-    pushValue(contop);
+    push_value(contop);
 }
 
 void LLVMGen::exitBoolLiteral(MLWParser::BoolLiteralContext* ctx) {
     bool value = (ctx->BooleanLiteral()->getText() == "true");
-    auto contop =
-        llvm::ConstantInt::get(llvm::Type::getInt1Ty(*this->ctx), value);
-    pushValue(contop);
+    auto contop = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*this->ctx), value);
+    push_value(contop);
 }
 
 void LLVMGen::enterIdentifierExpr(MLWParser::IdentifierExprContext* ctx) {
-    if (inCallExpr)
+    if (in_call_expr) {
         return;
-    std::string varName = ctx->identifier()->getText();
-    auto it = symbolTable.find(varName);
-    if (it != symbolTable.end()) {
-        pushValue(it->second);
+    }
+    std::string var_name = ctx->identifier()->getText();
+    auto it = symbol_table.find(var_name);
+    if (it != symbol_table.end()) {
+        push_value(it->second);
     } else {
-        llvm::errs() << "Undefined variable: " << varName;
+        llvm::errs() << "Undefined variable: " << var_name;
     }
 }
 
 void LLVMGen::exitVarDeclWithInit(MLWParser::VarDeclWithInitContext* ctx) {
-    std::string varName = ctx->identifier()->getText();
+    std::string var_name = ctx->identifier()->getText();
 
     // Get the initialization value from stack
-    if (valueStacks.top().empty()) {
-        llvm::errs() << "No value for variable initialization: " << varName;
+    if (value_stacks.top().empty()) {
+        llvm::errs() << "No value for variable initialization: " << var_name;
         return;
     }
 
-    auto initValue = popValue();
-    symbolTable[varName] = initValue;
+    auto init_value = pop_value();
+    symbol_table[var_name] = init_value;
 
-    pushValue(initValue);
+    push_value(init_value);
 }
 
 void LLVMGen::enterVarDeclWithoutInit(
     MLWParser::VarDeclWithoutInitContext* ctx) {
-    std::string varName = ctx->identifier()->getText();
-    auto type = getType(ctx->type()->getText());
+    std::string var_name = ctx->identifier()->getText();
+    auto type = get_type(ctx->type()->getText());
 
     // Create a default value
-    auto defaultVal = llvm::ConstantInt::get(type, 0);
+    auto default_val = llvm::ConstantInt::get(type, 0);
 
-    symbolTable[varName] = defaultVal;
-    pushValue(defaultVal);
+    symbol_table[var_name] = default_val;
+    push_value(default_val);
 }

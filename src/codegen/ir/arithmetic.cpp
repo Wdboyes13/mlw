@@ -6,19 +6,19 @@
 #include "../gen_llvm.hpp"
 
 void LLVMGen::enterAdditiveExpr(MLWParser::AdditiveExprContext* ctx) {
-    operatorStack.push(ctx->op->getText());
+    operator_stack.push(ctx->op->getText());
 }
 
 void LLVMGen::exitAdditiveExpr(MLWParser::AdditiveExprContext* ctx) {
-    if (valueStacks.top().size() < 2) {
+    if (value_stacks.top().size() < 2) {
         llvm::errs() << "Not enough values for additive expression\n";
         return;
     }
 
-    auto rhs = popValue();
-    auto lhs = popValue();
-    auto op = operatorStack.top();
-    operatorStack.pop();
+    auto rhs = pop_value();
+    auto lhs = pop_value();
+    auto op = operator_stack.top();
+    operator_stack.pop();
 
     // Verify both operands have the same type
     if (lhs->getType() != rhs->getType()) {
@@ -31,34 +31,35 @@ void LLVMGen::exitAdditiveExpr(MLWParser::AdditiveExprContext* ctx) {
     if (op == "+") {
         result = builder.CreateAdd(lhs, rhs);
     } else if (op == "-") {
-        result = builder.CreateSub(
-            lhs, rhs); // Fixed: CreateSub instead of CreateAdd
+        result =
+            builder.CreateSub(lhs,
+                              rhs); // Fixed: CreateSub instead of CreateAdd
     } else {
         llvm::errs() << "Unknown additive operator: " << op << "\n";
         return;
     }
 
     if (result) {
-        pushValue(result);
+        push_value(result);
     }
 }
 
 void LLVMGen::enterMultiplicativeExpr(
     MLWParser::MultiplicativeExprContext* ctx) {
-    operatorStack.push(ctx->op->getText());
+    operator_stack.push(ctx->op->getText());
 }
 
 void LLVMGen::exitMultiplicativeExpr(
     MLWParser::MultiplicativeExprContext* ctx) {
-    if (valueStacks.top().size() < 2) {
+    if (value_stacks.top().size() < 2) {
         llvm::errs() << "Not enough values for multiplicative expression\n";
         return;
     }
 
-    auto rhs = popValue();
-    auto lhs = popValue();
-    auto op = operatorStack.top();
-    operatorStack.pop();
+    auto rhs = pop_value();
+    auto lhs = pop_value();
+    auto op = operator_stack.top();
+    operator_stack.pop();
 
     // Verify both operands have the same type
     if (lhs->getType() != rhs->getType()) {
@@ -82,8 +83,7 @@ void LLVMGen::exitMultiplicativeExpr(
         if (lhs->getType()->isIntegerTy()) {
             result = builder.CreateSRem(lhs, rhs);
         } else {
-            llvm::errs()
-                << "Modulo operator only supported for integer types\n";
+            llvm::errs() << "Modulo operator only supported for integer types\n";
             return;
         }
     } else {
@@ -92,6 +92,6 @@ void LLVMGen::exitMultiplicativeExpr(
     }
 
     if (result) {
-        pushValue(result);
+        push_value(result);
     }
 }

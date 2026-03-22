@@ -1,5 +1,4 @@
-!import printer
-!extern println(i32) -> void
+@include "printer.mlwi"
 
 fn add(x: i32, y: i32) -> i32 {
     var res: i32 = x + y;

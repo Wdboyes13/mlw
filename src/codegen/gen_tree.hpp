@@ -17,8 +17,7 @@ struct ParseResources {
     std::unique_ptr<MLWLexer> lexer;
     std::unique_ptr<antlr4::CommonTokenStream> tokens;
     std::unique_ptr<MLWParser> parser;
-    MLWParser::ProgramContext* tree =
-        nullptr; // Raw pointer to the tree (owned by the parser)
+    MLWParser::ProgramContext* tree = nullptr; // Raw pointer to the tree (owned by the parser)
 };
 
 // Update generate_tree to return this new structure

@@ -10,4 +10,9 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(antlr4-runtime)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY
+    ADDITIONAL_CLEAN_FILES "${CMAKE_SOURCE_DIR}/bin" "${CMAKE_SOURCE_DIR}/target"
+)
+
 add_subdirectory(src)

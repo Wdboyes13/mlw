@@ -10,113 +10,107 @@
 
 using namespace antlr4;
 
-#define def_mlg_fctx(method_name) \
-    void LLVMGen::method_name(MLWParser::FunctionDefinitionContext* ctx)
-
-def_mlg_fctx(enterFunctionDefinition) {
-    valueStacks.push(std::stack<llvm::Value*>());
+void LLVMGen::enterFunctionDefinition(
+    MLWParser::FunctionDefinitionContext* ctx) {
+    value_stacks.push(std::stack<llvm::Value*>());
 
     std::string fn_name = ctx->identifier()->getText();
-    symbolTable.clear();
-    std::vector<llvm::Type*> paramTypes;
-    if (auto paramList = ctx->parameterList()) {
-        for (auto param : paramList->parameter()) {
+    symbol_table.clear();
+    std::vector<llvm::Type*> param_types;
+    if (auto param_list = ctx->parameterList()) {
+        for (auto param : param_list->parameter()) {
             auto typnam = param->type()->getText();
-            paramTypes.push_back(getType(typnam));
+            param_types.push_back(get_type(typnam));
         }
     }
 
-    llvm::Type* returnType = getType(ctx->type()->getText());
-    auto fntype = llvm::FunctionType::get(returnType, paramTypes, false);
+    llvm::Type* return_type = get_type(ctx->type()->getText());
+    auto fntype = llvm::FunctionType::get(return_type, param_types, false);
 
-    currentFunction = llvm::Function::Create(
-        fntype, llvm::Function::ExternalLinkage, fn_name, _module.get());
+    current_function = llvm::Function::Create(
+        fntype,
+        llvm::Function::ExternalLinkage,
+        fn_name,
+        module.get());
 
-    auto entry_block =
-        llvm::BasicBlock::Create(*this->ctx, "entry", currentFunction);
+    auto entry_block = llvm::BasicBlock::Create(*this->ctx, "entry", current_function);
     builder.SetInsertPoint(entry_block);
 
-    if (auto paramList = ctx->parameterList()) {
+    if (auto param_list = ctx->parameterList()) {
         size_t i = 0;
         // Use the function's arg_iterator to get the SSA values for parameters
-        for (auto& Arg : currentFunction->args()) {
+        for (auto& arg : current_function->args()) {
             // Get the name from your parser context
-            std::string paramName =
-                paramList->parameter(i)->identifier()->getText();
+            std::string param_name = param_list->parameter(i)->identifier()->getText();
 
             // Set the SSA name in the IR for debugging (optional but
             // recommended)
-            Arg.setName(paramName);
+            arg.setName(param_name);
 
             // Store the llvm::Value* (the argument itself) in the symbol table
-            symbolTable[paramName] = &Arg;
+            symbol_table[param_name] = &arg;
             i++;
         }
     }
 }
 
-def_mlg_fctx(exitFunctionDefinition) {
+void LLVMGen::exitFunctionDefinition(
+    MLWParser::FunctionDefinitionContext* ctx) {
     if (!builder.GetInsertBlock()->getTerminator()) {
-        if (currentFunction->getReturnType()->isVoidTy()) {
+        if (current_function->getReturnType()->isVoidTy()) {
             builder.CreateRetVoid();
         } else {
             // For non-void functions, this is an error
             llvm::errs()
                 << "Error: Non-void function missing return statement: "
-                << currentFunction->getName() << "\n";
+                << current_function->getName() << "\n";
             // Create an undef return as fallback (not ideal, but prevents
             // crash)
-            builder.CreateRet(
-                llvm::UndefValue::get(currentFunction->getReturnType()));
+            builder.CreateRet(llvm::UndefValue::get(current_function->getReturnType()));
         }
     }
 
-    currentFunction = nullptr;
-    if (!valueStacks.empty()) {
-        valueStacks.pop();
+    current_function = nullptr;
+    if (!value_stacks.empty()) {
+        value_stacks.pop();
     }
 }
 
 void LLVMGen::exitRetStmt(MLWParser::RetStmtContext* ctx) {
     if (ctx->expression()) {
-        if (valueStacks.top().empty()) {
+        if (value_stacks.top().empty()) {
             llvm::errs() << "No value for return expression\n";
-            builder.CreateRet(
-                llvm::UndefValue::get(currentFunction->getReturnType()));
+            builder.CreateRet(llvm::UndefValue::get(current_function->getReturnType()));
         } else {
-            llvm::Value* retVal = popValue();
+            llvm::Value* ret_val = pop_value();
             // Add type checking
-            if (retVal->getType() != currentFunction->getReturnType()) {
-                llvm::errs() << "Function return type does not match return "
-                                "value type!\n";
+            if (ret_val->getType() != current_function->getReturnType()) {
+                llvm::errs() << "Function return type does not match return value type!\n";
             }
-            builder.CreateRet(retVal);
+            builder.CreateRet(ret_val);
         }
     } else {
         // For void returns, ensure function returns void
-        if (!currentFunction->getReturnType()->isVoidTy()) {
+        if (!current_function->getReturnType()->isVoidTy()) {
             llvm::errs() << "Error: Returning void from non-void function: "
-                         << currentFunction->getName() << "\n";
+                         << current_function->getName() << "\n";
         }
         builder.CreateRetVoid();
     }
 }
 
 void LLVMGen::enterCallExpr(MLWParser::CallExprContext* ctx) {
-    inCallExpr = true;
+    in_call_expr = true;
 }
 
 void LLVMGen::exitCallExpr(MLWParser::CallExprContext* ctx) {
-    std::string calleeName;
-    auto innerPostfix = ctx->postfixExpression();
+    std::string callee_name;
+    auto inner_postfix = ctx->postfixExpression();
 
     // Check if the inner postfix expression is just an identifier
-    if (auto primaryCtx =
-            dynamic_cast<MLWParser::PrimaryPostfixContext*>(innerPostfix)) {
-        if (auto identifierCtx =
-                dynamic_cast<MLWParser::IdentifierExprContext*>(
-                    primaryCtx->primaryExpression())) {
-            calleeName = identifierCtx->identifier()->getText();
+    if (auto primary_ctx = dynamic_cast<MLWParser::PrimaryPostfixContext*>(inner_postfix)) {
+        if (auto identifier_ctx = dynamic_cast<MLWParser::IdentifierExprContext*>(primary_ctx->primaryExpression())) {
+            callee_name = identifier_ctx->identifier()->getText();
         } else {
             llvm::errs() << "Call expression must be an identifier\n";
             return;
@@ -126,32 +120,31 @@ void LLVMGen::exitCallExpr(MLWParser::CallExprContext* ctx) {
     // Collect arguments from value stack
     std::vector<llvm::Value*> args;
 
-    MLWParser::ArgumentListContext* argLists = ctx->argumentList();
-    if (argLists && !argLists->isEmpty()) {
-        size_t argCount = argLists->expression().size();
-        args.resize(argCount);
+    MLWParser::ArgumentListContext* arg_lists = ctx->argumentList();
+    if (arg_lists && !arg_lists->isEmpty()) {
+        size_t arg_count = arg_lists->expression().size();
+        args.resize(arg_count);
 
         // Pop arguments in reverse order
-        for (int i = argCount - 1; i >= 0; --i) {
-            if (valueStacks.top().empty()) {
-                llvm::errs() << "Not enough arguments for function call to "
-                             << calleeName;
+        for (int i = arg_count - 1; i >= 0; --i) {
+            if (value_stacks.top().empty()) {
+                llvm::errs() << "Not enough arguments for function call to " << callee_name;
                 return;
             }
-            args[i] = popValue();
+            args[i] = pop_value();
         }
     }
 
     // Look for the function
-    auto func = _module->getFunction(calleeName);
+    auto func = module->getFunction(callee_name);
     if (!func) {
-        llvm::errs() << "Undefined function: " << calleeName;
+        llvm::errs() << "Undefined function: " << callee_name;
         return;
     }
 
     // Verify argument counts match
     if (args.size() != func->arg_size()) {
-        llvm::errs() << "Argument count mismatch for function: " << calleeName;
+        llvm::errs() << "Argument count mismatch for function: " << callee_name;
         return;
     }
 
@@ -159,7 +152,7 @@ void LLVMGen::exitCallExpr(MLWParser::CallExprContext* ctx) {
 
     // ONLY push if the function returns a non-void value
     if (!call->getType()->isVoidTy()) {
-        pushValue(call);
+        push_value(call);
     }
-    inCallExpr = false;
+    in_call_expr = false;
 }

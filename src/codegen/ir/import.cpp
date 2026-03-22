@@ -16,31 +16,36 @@ void LLVMGen::enterImportStatement(MLWParser::ImportStatementContext* ctx) {
         return;
     }
     const auto libname = ctx->identifier()->getText();
-    llvm::Constant* globalStr =
-        llvm::ConstantDataArray::getString(*this->ctx, libname);
+    llvm::Constant* global_str = llvm::ConstantDataArray::getString(*this->ctx, libname);
     llvm::GlobalVariable* gv =
-        new llvm::GlobalVariable(*_module, globalStr->getType(),
-                                 true, // isConstant
-                                 llvm::GlobalValue::ExternalLinkage, globalStr,
-                                 "__vm_implibs." + std::to_string(implibs_idx));
+        new llvm::GlobalVariable(
+            *module,
+            global_str->getType(),
+            true, // isConstant
+            llvm::GlobalValue::ExternalLinkage,
+            global_str,
+            "__vm_implibs." + std::to_string(implibs_idx));
 
     implibs_idx++;
 }
 
 void LLVMGen::enterExternStatement(MLWParser::ExternStatementContext* ctx) {
     std::string fn_name = ctx->identifier()->getText();
-    symbolTable.clear();
-    std::vector<llvm::Type*> paramTypes;
-    if (auto paramList = ctx->parameterList_typeonly()) {
-        for (auto param : paramList->parameter_typeonly()) {
-            auto typeName = param->type()->getText();
-            paramTypes.push_back(getType(typeName));
+    symbol_table.clear();
+    std::vector<llvm::Type*> param_types;
+    if (auto param_list = ctx->parameterList_typeonly()) {
+        for (auto param : param_list->parameter_typeonly()) {
+            auto type_name = param->type()->getText();
+            param_types.push_back(get_type(type_name));
         }
     }
 
-    auto returnType = getType(ctx->type()->getText());
-    auto fn_type = llvm::FunctionType::get(returnType, paramTypes, false);
+    auto return_type = get_type(ctx->type()->getText());
+    auto fn_type = llvm::FunctionType::get(return_type, param_types, false);
 
-    llvm::Function::Create(fn_type, llvm::Function::ExternalLinkage, fn_name,
-                           _module.get());
+    llvm::Function::Create(
+        fn_type,
+        llvm::Function::ExternalLinkage,
+        fn_name,
+        module.get());
 }

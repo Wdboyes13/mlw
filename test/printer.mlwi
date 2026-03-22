@@ -1,0 +1,2 @@
+!import printer
+!extern println(i32) -> void

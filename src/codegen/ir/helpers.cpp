@@ -6,29 +6,32 @@
 #include "../gen_llvm.hpp"
 
 // Helper methods
-llvm::Type* LLVMGen::getType(const std::string& typeName) {
+llvm::Type* LLVMGen::get_type(const std::string& typeName) {
     auto i8type = llvm::Type::getInt8Ty(*ctx);
-    if (typeName == "i32")
+    if (typeName == "i32") {
         return llvm::Type::getInt32Ty(*ctx);
-    if (typeName == "i64")
+    } else if (typeName == "i64") {
         return llvm::Type::getInt64Ty(*ctx);
-    if (typeName == "f32")
+    } else if (typeName == "f32") {
         return llvm::Type::getFloatTy(*ctx);
-    if (typeName == "f64")
+    } else if (typeName == "f64") {
         return llvm::Type::getDoubleTy(*ctx);
-    if (typeName == "bool")
+    } else if (typeName == "bool") {
         return llvm::Type::getInt1Ty(*ctx);
-    if (typeName == "void")
+    } else if (typeName == "void") {
         return llvm::Type::getVoidTy(*ctx);
-    return llvm::Type::getInt32Ty(*ctx); // Default
+    } else {
+        return llvm::Type::getInt32Ty(*ctx);
+    }
 }
 
-llvm::Value* LLVMGen::popValue() {
-    if (valueStacks.top().empty())
+llvm::Value* LLVMGen::pop_value() {
+    if (value_stacks.top().empty()) {
         return nullptr;
-    auto val = std::move(valueStacks.top().top());
-    valueStacks.top().pop();
+    }
+    auto val = std::move(value_stacks.top().top());
+    value_stacks.top().pop();
     return val;
 }
 
-void LLVMGen::pushValue(llvm::Value* value) { valueStacks.top().push(value); }
+void LLVMGen::push_value(llvm::Value* value) { value_stacks.top().push(value); }

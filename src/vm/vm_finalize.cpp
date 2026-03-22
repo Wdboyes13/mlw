@@ -8,38 +8,40 @@
 
 void MLWVM::finalize() {
     // Create LLJIT instance
-    auto jitResult = llvm::orc::LLJITBuilder().create();
-    if (!jitResult) {
+    auto jit_result = llvm::orc::LLJITBuilder().create();
+    if (!jit_result) {
         log << "Failed to create LLJIT: "
-            << llvm::toString(jitResult.takeError()) << "\n";
+            << llvm::toString(jit_result.takeError()) << "\n";
         log.abort();
     }
 
-    jit = std::move(*jitResult);
+    jit = std::move(*jit_result);
 
     // Load system libraries first
     llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 
     // Load your import libraries
-    for (const auto& libName : implibs) {
-        std::string fullLibName = locate_lib(libName);
+    for (const auto& lib_name : implibs) {
+        std::string full_lib_name = locate_lib(lib_name);
 
-        log << "Loading library: " << fullLibName << "\n";
+        log << "Loading library: " << full_lib_name << "\n";
 
-        std::string errorMsg;
+        std::string error_msg;
         if (!llvm::sys::DynamicLibrary::LoadLibraryPermanently(
-                fullLibName.c_str(), &errorMsg)) {
-            log << "Successfully loaded: " << fullLibName << "\n";
+                full_lib_name.c_str(),
+                &error_msg)) {
+            log << "Successfully loaded: " << full_lib_name << "\n";
         } else {
-            log << "Warning: Failed to load " << fullLibName << ": " << errorMsg
-                << "\n";
+            log << "Warning: Failed to load " << full_lib_name << ": "
+                << error_msg << "\n";
 
             // Try without prefix/suffix
             if (!llvm::sys::DynamicLibrary::LoadLibraryPermanently(
-                    libName.c_str(), &errorMsg)) {
-                log << "Successfully loaded: " << libName << " (raw name)\n";
+                    lib_name.c_str(),
+                    &error_msg)) {
+                log << "Successfully loaded: " << lib_name << " (raw name)\n";
             } else {
-                log << "Error: Could not load library in any form: " << libName
+                log << "Error: Could not load library in any form: " << lib_name
                     << "\n";
                 log.abort();
             }

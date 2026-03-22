@@ -25,7 +25,7 @@
 class LLVMGen : public MLWBaseListener {
   public:
     LLVMGen(llvm::LLVMContext* ctx, ParseResources* _rsrsc, bool debug = false);
-    auto getModule() { return std::move(_module); }
+    auto get_module() { return std::move(module); }
 
     // Override key listener methods
     void enterProgram(MLWParser::ProgramContext* ctx) override;
@@ -71,21 +71,21 @@ class LLVMGen : public MLWBaseListener {
   private:
     llvm::LLVMContext* ctx;
     llvm::IRBuilder<> builder;
-    std::unique_ptr<llvm::Module> _module;
+    std::unique_ptr<llvm::Module> module;
 
-    std::map<std::string, llvm::Value*> symbolTable;
-    std::stack<std::stack<llvm::Value*>> valueStacks;
-    std::stack<std::string> operatorStack;
-    llvm::Function* currentFunction;
+    std::map<std::string, llvm::Value*> symbol_table;
+    std::stack<std::stack<llvm::Value*>> value_stacks;
+    std::stack<std::string> operator_stack;
+    llvm::Function* current_function;
 
     std::vector<llvm::Attribute> libs;
-    bool inCallExpr;
+    bool in_call_expr;
     // Helper methods
-    llvm::Type* getType(const std::string& typeName);
-    llvm::Value* popValue();
-    void pushValue(llvm::Value* value);
+    llvm::Type* get_type(const std::string& typeName);
+    llvm::Value* pop_value();
+    void push_value(llvm::Value* value);
 
-    std::stack<llvm::IRBuilderBase::InsertPoint> insertionStack;
+    std::stack<llvm::IRBuilderBase::InsertPoint> insertion_stack;
     int implibs_idx = 0;
     int str_idx = 0;
 

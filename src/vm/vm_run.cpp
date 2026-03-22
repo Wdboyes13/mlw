@@ -6,8 +6,8 @@
 #include "vm_class.hpp"
 
 llvm::GenericValue
-MLWVM::runFunction(const std::string& functionName,
-                   const std::vector<llvm::GenericValue>& args) {
+MLWVM::run_function(const std::string& functionName,
+                    const std::vector<llvm::GenericValue>& args) {
     if (!jit) {
         log << "JIT not initialized. Call finalize() first.\n";
         return llvm::GenericValue();
@@ -25,8 +25,8 @@ MLWVM::runFunction(const std::string& functionName,
 
     // Cast to function pointer and call
     using MainFunc = int (*)(void);
-    auto funcPtr = sym.get().toPtr<MainFunc>();
-    int result = funcPtr();
+    auto func_ptr = sym.get().toPtr<MainFunc>();
+    int result = func_ptr();
 
     // Convert to GenericValue
     llvm::GenericValue gv;

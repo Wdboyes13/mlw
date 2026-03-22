@@ -7,3 +7,9 @@ src/antlr/.antlr
 .idea
 .DS_Store
 src/.DS_Store
+bin/
+dist/
+Cargo.lock
+target/
+test/*.log
+test/printer
